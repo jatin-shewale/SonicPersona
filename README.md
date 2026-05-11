@@ -25,18 +25,26 @@ The application follows a client-server architecture with modular service layers
 
 ```mermaid
 graph TD
-    A[React Client<br/>Frontend] -->|HTTP/HTTPS| B[Flask Server<br/>Backend API]
-    B -->|OAuth 2.0| C[Spotify Web API<br/>User Data]
-    B -->|Local Inference| D[Ollama Service<br/>Llama3 AI]
-    B -->|Data Processing| E[Personality Service<br/>Analysis Engine]
-    B -->|Playlist Creation| F[Playlist Service<br/>Spotify Integration]
-    
-    style A fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
-    style B fill:#F3E5F5,stroke:#7B1FA2,stroke-width:2px
-    style C fill:#E8F5E8,stroke:#388E3C,stroke-width:2px
-    style D fill:#FFF3E0,stroke:#F57C00,stroke-width:2px
-    style E fill:#FCE4EC,stroke:#C2185B,stroke-width:2px
-    style F fill:#E0F2F1,stroke:#00695C,stroke-width:2px
+    A["React Client<br/><b>Frontend UI</b>"] -->|HTTP / HTTPS| B["Flask Server<br/><b>Backend API</b>"]
+    B -->|OAuth 2.0 Authentication| C["Spotify Web API<br/><b>User Music Data</b>"]
+    B -->|Local AI Inference| D["Ollama Service<br/><b>Llama3 Intelligence</b>"]
+    B -->|Behavior Analysis| E["Personality Engine<br/><b>Psychological Insights</b>"]
+    B -->|Smart Playlist Creation| F["Playlist Service<br/><b>Spotify Integration</b>"]
+
+    %% Node Styling
+    style A fill:#D6EAF8,stroke:#1B4F72,stroke-width:3px,color:#111111
+    style B fill:#E8DAEF,stroke:#6C3483,stroke-width:3px,color:#111111
+    style C fill:#D5F5E3,stroke:#1E8449,stroke-width:3px,color:#111111
+    style D fill:#FDEBD0,stroke:#CA6F1E,stroke-width:3px,color:#111111
+    style E fill:#FADBD8,stroke:#C0392B,stroke-width:3px,color:#111111
+    style F fill:#D1F2EB,stroke:#117864,stroke-width:3px,color:#111111
+
+    %% Link Styling
+    linkStyle 0 stroke:#5D6D7E,stroke-width:2px,color:#111111
+    linkStyle 1 stroke:#5D6D7E,stroke-width:2px,color:#111111
+    linkStyle 2 stroke:#5D6D7E,stroke-width:2px,color:#111111
+    linkStyle 3 stroke:#5D6D7E,stroke-width:2px,color:#111111
+    linkStyle 4 stroke:#5D6D7E,stroke-width:2px,color:#111111
 ```
 
 ### Architecture Components
