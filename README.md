@@ -298,3 +298,4 @@ For questions or issues:
 - Open an issue on GitHub
 - Check the demo mode for testing
 - Ensure all prerequisites are properly installed
+- Jatin Shewale
