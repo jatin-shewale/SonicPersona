@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { Moon, Shuffle, Sparkles } from 'lucide-react'
 
 export default function PersonalityCard({ archetype, aiInsights }) {
   if (!archetype) return null
@@ -29,7 +30,10 @@ export default function PersonalityCard({ archetype, aiInsights }) {
             {archetype.emoji}
           </div>
           <div>
-            <p className="text-white/30 text-xs font-mono uppercase tracking-widest mb-1">Your Archetype</p>
+            <div className="flex items-center gap-2 text-white/30 text-xs font-mono uppercase tracking-widest mb-1">
+              <Sparkles size={12} />
+              <span>Your Archetype</span>
+            </div>
             <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-white">
               {archetype.name}
             </h2>
@@ -61,7 +65,10 @@ export default function PersonalityCard({ archetype, aiInsights }) {
         {/* Meters */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <p className="text-white/30 text-xs font-mono mb-2">🌙 Night Drive Score</p>
+            <div className="flex items-center gap-2 mb-2 text-white/30 text-xs font-mono">
+              <Moon size={14} />
+              <span>Night Drive Score</span>
+            </div>
             <div className="h-2 bg-white/5 rounded-full overflow-hidden">
               <motion.div
                 className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-500"
@@ -73,7 +80,10 @@ export default function PersonalityCard({ archetype, aiInsights }) {
             <span className="text-indigo-400 text-xs font-mono mt-1 block">{nightScore}/100</span>
           </div>
           <div>
-            <p className="text-white/30 text-xs font-mono mb-2">⚖️ Chaos vs Calm</p>
+            <div className="flex items-center gap-2 mb-2 text-white/30 text-xs font-mono">
+              <Shuffle size={14} />
+              <span>Chaos vs Calm</span>
+            </div>
             <div className="h-2 bg-white/5 rounded-full overflow-hidden">
               <motion.div
                 className="h-full rounded-full bg-gradient-to-r from-teal-500 to-cyan-400"

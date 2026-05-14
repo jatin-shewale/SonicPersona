@@ -1,17 +1,20 @@
 import { useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Download, Loader2 } from 'lucide-react'
+import { Download, Loader2, Instagram, MessageSquare, Copy } from 'lucide-react'
 
 export default function ShareCard({ result }) {
   const cardRef = useRef(null)
   const [downloading, setDownloading] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  const shareText = `My SonicPersona archetype is ${result?.archetype?.name}. Download the card and share your music personality on Instagram or WhatsApp!`
 
   const handleDownload = async () => {
     if (!cardRef.current || downloading) return
     setDownloading(true)
     try {
       const html2canvas = (await import('html2canvas')).default
-      await new Promise(r => setTimeout(r, 100))
+      await new Promise((r) => setTimeout(r, 100))
       const canvas = await html2canvas(cardRef.current, {
         backgroundColor: '#0a0a0f',
         scale: 2,
@@ -33,6 +36,38 @@ export default function ShareCard({ result }) {
     } catch (err) {
       console.error('Download error:', err)
       setDownloading(false)
+    }
+  }
+
+  const handleShareWhatsApp = () => {
+    const message = encodeURIComponent(`${shareText} #SonicPersona`)
+    window.open(`https://api.whatsapp.com/send?text=${message}`, '_blank')
+  }
+
+  const handleShareInstagram = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'My SonicPersona Card',
+          text: shareText,
+        })
+        return
+      } catch {
+        // fallback to Instagram web if native share is unavailable
+      }
+    }
+    const fallbackText = `${shareText} Download the PNG and post it to Instagram.`
+    await navigator.clipboard.writeText(fallbackText)
+    setCopied(true)
+    window.open('https://www.instagram.com/', '_blank')
+  }
+
+  const handleCopyText = async () => {
+    try {
+      await navigator.clipboard.writeText(shareText)
+      setCopied(true)
+    } catch (err) {
+      console.error('Copy failed:', err)
     }
   }
 
@@ -59,12 +94,15 @@ export default function ShareCard({ result }) {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-md bg-brand-green flex items-center justify-center">
-                <span className="text-black text-xs font-bold">S</span>
+              <div className="w-8 h-8 rounded-2xl bg-brand-green/10 border border-brand-green/20 flex items-center justify-center">
+                <span className="text-brand-green text-base font-black">S</span>
               </div>
-              <span className="font-display font-bold text-white text-sm tracking-tight">SonicPersona</span>
+              <div>
+                <p className="text-white text-sm font-display font-bold tracking-tight">SonicPersona</p>
+                <p className="text-white/30 text-xs font-mono">Music identity studio</p>
+              </div>
             </div>
-            <span className="text-white/20 text-xs font-mono">sounddna.app</span>
+            <span className="text-white/20 text-xs font-mono">sonicpersona.app</span>
           </div>
 
           {/* Archetype */}
@@ -114,7 +152,7 @@ export default function ShareCard({ result }) {
       </div>
 
       {/* Download button */}
-      <div className="flex justify-center mt-6">
+      <div className="flex flex-col gap-4 items-center mt-6">
         <motion.button
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
@@ -129,6 +167,27 @@ export default function ShareCard({ result }) {
           )}
           {downloading ? 'Generating...' : 'Download PNG'}
         </motion.button>
+
+        <div className="w-full grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
+          <button
+            onClick={handleShareInstagram}
+            className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#E1306C]/10 border border-[#E1306C]/20 text-[#E1306C] hover:bg-[#E1306C]/15 transition-all font-display text-sm"
+          >
+            <Instagram size={16} /> Instagram
+          </button>
+          <button
+            onClick={handleShareWhatsApp}
+            className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#25D366]/10 border border-[#25D366]/20 text-[#25D366] hover:bg-[#25D366]/15 transition-all font-display text-sm"
+          >
+            <MessageSquare size={16} /> WhatsApp
+          </button>
+          <button
+            onClick={handleCopyText}
+            className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:text-white hover:border-white/20 transition-all font-display text-sm"
+          >
+            <Copy size={16} /> {copied ? 'Copied!' : 'Copy Text'}
+          </button>
+        </div>
       </div>
     </div>
   )

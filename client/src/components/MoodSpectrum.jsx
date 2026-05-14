@@ -1,12 +1,13 @@
 import { motion } from 'framer-motion'
+import { Zap, Music2, Headphones, Sun, Music, Mic } from 'lucide-react'
 
 const MOOD_CONFIG = {
-  energy: { label: 'Energy', emoji: '⚡', desc: 'Intensity & power' },
-  danceability: { label: 'Danceability', emoji: '💃', desc: 'Groove & rhythm' },
-  acousticness: { label: 'Acoustic', emoji: '🎸', desc: 'Natural & raw sound' },
-  valence: { label: 'Positivity', emoji: '☀️', desc: 'Emotional brightness' },
-  instrumentalness: { label: 'Instrumental', emoji: '🎼', desc: 'Music over lyrics' },
-  speechiness: { label: 'Vocal Depth', emoji: '🎤', desc: 'Spoken word energy' },
+  energy: { label: 'Energy', icon: Zap, desc: 'Intensity & power' },
+  danceability: { label: 'Danceability', icon: Music2, desc: 'Groove & rhythm' },
+  acousticness: { label: 'Acoustic', icon: Headphones, desc: 'Natural & raw sound' },
+  valence: { label: 'Positivity', icon: Sun, desc: 'Emotional brightness' },
+  instrumentalness: { label: 'Instrumental', icon: Music, desc: 'Music over lyrics' },
+  speechiness: { label: 'Vocal Depth', icon: Mic, desc: 'Spoken word energy' },
 }
 
 const getBarColor = (value) => {
@@ -31,7 +32,7 @@ export default function MoodSpectrum({ data }) {
           >
             <div className="flex items-center justify-between mb-1.5">
               <div className="flex items-center gap-2">
-                <span className="text-base">{config.emoji}</span>
+                <config.icon size={14} className="text-white/70" />
                 <span className="text-white text-xs font-display font-bold uppercase tracking-wider">{config.label}</span>
                 <span className="text-white/20 text-xs font-body hidden sm:block">· {config.desc}</span>
               </div>

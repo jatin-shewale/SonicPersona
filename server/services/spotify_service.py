@@ -73,6 +73,10 @@ class SpotifyService:
                 params=params or {},
                 timeout=15,
             )
+            if resp.status_code >= 400:
+                print(
+                    f"Spotify GET {path} failed {resp.status_code}: {resp.text}"
+                )
             resp.raise_for_status()
             return resp.json()
         except Exception as e:
@@ -102,21 +106,125 @@ class SpotifyService:
     def get_top_tracks(self, token: str, limit=50, time_range="long_term") -> dict | None:
         return self._get(token, "/me/top/tracks", {"limit": limit, "time_range": time_range})
 
-    def get_audio_features(self, token: str, track_ids: list) -> dict | None:
-        ids_str = ",".join(track_ids[:100])
-        result = self._get(token, "/audio-features", {"ids": ids_str})
-        if result is not None:
-            return result
+    def _genre_keyword_score(self, genre_text: str, keywords: dict) -> float:
+        score = 0.0
+        for keyword, boost in keywords.items():
+            if keyword in genre_text:
+                score += boost
+        return score
 
-        # Fallback: fetch audio features one track at a time to avoid batch restrictions
+    def _estimate_audio_features(self, track: dict, genres: list) -> dict:
+        popularity = min(max(track.get("popularity", 50) / 100, 0.0), 1.0)
+        release_date = track.get("release_date", "") or ""
+        year = 2020
+        try:
+            if len(release_date) >= 4:
+                year = int(release_date[:4])
+        except ValueError:
+            year = 2020
+
+        genre_text = " ".join(genres).lower()
+        energy_boost = self._genre_keyword_score(genre_text, {
+            "pop": 0.08, "dance": 0.1, "electronic": 0.12, "hip hop": 0.12,
+            "rap": 0.1, "rock": 0.08, "metal": 0.08, "punk": 0.08,
+            "house": 0.1, "techno": 0.1, "drum and bass": 0.1, "dubstep": 0.08,
+        })
+        dance_boost = self._genre_keyword_score(genre_text, {
+            "dance": 0.12, "pop": 0.08, "electronic": 0.08,
+            "disco": 0.1, "hip hop": 0.08, "rap": 0.08, "r&b": 0.06,
+            "house": 0.08, "funk": 0.06,
+        })
+        acoustic_boost = self._genre_keyword_score(genre_text, {
+            "acoustic": 0.25, "ambient": 0.2, "jazz": 0.15,
+            "folk": 0.18, "soul": 0.14, "classical": 0.18, "blues": 0.16,
+            "neo soul": 0.12, "indie": 0.08,
+        })
+        valence_boost = self._genre_keyword_score(genre_text, {
+            "pop": 0.1, "dance": 0.08, "house": 0.08, "soul": 0.06,
+            "r&b": 0.06, "feel good": 0.1,
+        })
+        speech_boost = self._genre_keyword_score(genre_text, {
+            "hip hop": 0.12, "rap": 0.12, "spoken word": 0.1, "jazz": 0.04,
+        })
+
+        energy = min(max(0.3 + popularity * 0.45 + energy_boost, 0.05), 0.95)
+        danceability = min(max(0.25 + popularity * 0.45 + dance_boost, 0.05), 0.95)
+        acousticness = min(max(0.45 - popularity * 0.25 + acoustic_boost, 0.02), 0.95)
+        valence = min(max(0.38 + popularity * 0.25 + valence_boost, 0.05), 0.95)
+        speechiness = min(max(0.05 + speech_boost, 0.03), 0.45)
+        tempo = int(min(max(90 + energy * 30 + danceability * 20 + popularity * 10, 70), 160))
+
+        return {
+            "acousticness": acousticness,
+            "danceability": danceability,
+            "energy": energy,
+            "instrumentalness": 0.02,
+            "liveness": 0.15,
+            "speechiness": speechiness,
+            "tempo": tempo,
+            "valence": valence,
+        }
+
+    def get_audio_features(self, token: str, track_ids: list) -> dict | None:
+        ids = [tid for tid in dict.fromkeys(track_ids) if tid]
+        ids = ids[:100]
+        if not ids:
+            return None
+
+        def fetch_batch(ids_batch):
+            ids_str = ",".join(ids_batch)
+            url = f"{self.BASE_URL}/audio-features?ids={ids_str}"
+            try:
+                resp = requests.get(
+                    url,
+                    headers=self._bearer_header(token),
+                    timeout=15,
+                )
+                if resp.status_code >= 400:
+                    print(f"Spotify GET /audio-features failed {resp.status_code}: {resp.text}")
+                resp.raise_for_status()
+                return resp.json()
+            except Exception as e:
+                print(f"Spotify GET /audio-features error: {e}")
+                return None
+
+        # Try the full batch first.
+        result = fetch_batch(ids)
+        if result and result.get("audio_features") is not None:
+            audio_features = [af for af in result["audio_features"] if af]
+            if audio_features:
+                return {"audio_features": audio_features}
+
+        # Fallback: fetch audio features one track at a time and ignore blocked tracks.
         audio_features = []
-        for track_id in track_ids[:100]:
+        for track_id in ids:
             track_result = self._get(token, f"/audio-features/{track_id}")
-            if track_result:
+            if track_result and track_result.get("id"):
                 audio_features.append(track_result)
+            else:
+                print(f"Skipping unavailable audio features for track {track_id}")
+
         if audio_features:
             return {"audio_features": audio_features}
-        return None
+
+        # If Spotify blocks audio feature lookup, return default features so analysis can continue.
+        print(f"Spotify audio features unavailable for {len(ids)} tracks, using defaults.")
+        return {
+            "audio_features": [
+                {
+                    "id": track_id,
+                    "acousticness": 0.5,
+                    "danceability": 0.5,
+                    "energy": 0.5,
+                    "instrumentalness": 0.0,
+                    "liveness": 0.2,
+                    "speechiness": 0.1,
+                    "tempo": 120,
+                    "valence": 0.5,
+                }
+                for track_id in ids
+            ]
+        }
 
     def get_recently_played(self, token: str, limit=50) -> dict | None:
         return self._get(token, "/me/player/recently-played", {"limit": limit})
@@ -133,13 +241,8 @@ class SpotifyService:
         top_artists = artists_data.get("items", [])
         top_tracks = tracks_data.get("items", [])
 
-        # Fetch audio features for top tracks
-        track_ids = [t["id"] for t in top_tracks if t.get("id")]
-        audio_features = []
-        if track_ids:
-            af_data = self.get_audio_features(token, track_ids)
-            if af_data:
-                audio_features = [f for f in af_data.get("audio_features", []) if f]
+        # Estimate audio features from track metadata instead of calling Spotify feature endpoints.
+        artist_genre_map = {artist["id"]: artist.get("genres", []) for artist in top_artists}
 
         # Parse artists
         parsed_artists = [
@@ -173,20 +276,12 @@ class SpotifyService:
             for t in top_tracks
         ]
 
-        # Map audio features to tracks
-        af_map = {af["id"]: af for af in audio_features if af.get("id")}
         for track in parsed_tracks:
-            af = af_map.get(track["id"], {})
-            track["audio_features"] = {
-                "acousticness": af.get("acousticness", 0.5),
-                "danceability": af.get("danceability", 0.5),
-                "energy": af.get("energy", 0.5),
-                "instrumentalness": af.get("instrumentalness", 0.0),
-                "liveness": af.get("liveness", 0.2),
-                "speechiness": af.get("speechiness", 0.1),
-                "tempo": af.get("tempo", 120),
-                "valence": af.get("valence", 0.5),
-            }
+            track_genres = []
+            for artist_id in track.get("artist_ids", []):
+                track_genres.extend(artist_genre_map.get(artist_id, []))
+
+            track["audio_features"] = self._estimate_audio_features(track, track_genres)
 
         # Recently played
         recent_tracks = []

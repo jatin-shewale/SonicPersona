@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { RefreshCw, BarChart3, Music2, Users, Clock, TrendingUp } from 'lucide-react'
+import { RefreshCw, BarChart3, Music2, Users, Clock, TrendingUp, Brain, Share2, AlertTriangle, Star } from 'lucide-react'
 import AnimatedBackground from '../components/AnimatedBackground'
 import PersonalityCard from '../components/PersonalityCard'
 import MoodSpectrum from '../components/MoodSpectrum'
@@ -78,7 +78,7 @@ export default function ResultsPage() {
       {isDemo && (
         <div className="fixed top-16 left-0 right-0 z-40 flex justify-center">
           <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono">
-            ⚠️ Demo Mode — Connect Spotify for real results
+            <AlertTriangle size={14} /> Demo Mode — Connect Spotify for real results
           </div>
         </div>
       )}
@@ -133,7 +133,7 @@ export default function ResultsPage() {
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
           <div className="space-y-8">
-            {/* Main personality + alter ego */}
+            <Section title={<> <Star size={18} /> Your Archetype & Music Alter Ego</>}>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <PersonalityCard archetype={archetype} aiInsights={ai_insights} />
               <div className="space-y-4">
@@ -141,21 +141,22 @@ export default function ResultsPage() {
                 <AuraCard aiInsights={ai_insights} />
               </div>
             </div>
+          </Section>
 
             {/* Insights */}
-            <Section title="🧠 AI Personality Readings">
+            <Section title={<> <Brain size={18} /> AI Personality Readings</>}>
               <InsightCards aiInsights={ai_insights} />
             </Section>
 
             {/* Mood + Genre side by side */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Section title="🎭 Mood Spectrum">
+              <Section title={<> <Music2 size={18} /> Mood Spectrum</>}>
                 <div className="glass rounded-2xl p-6 border border-white/5">
                   <MoodSpectrum data={mood_spectrum} />
                 </div>
               </Section>
 
-              <Section title="🧬 Genre DNA">
+              <Section title={<> <BarChart3 size={18} /> Genre DNA</>}>
                 <div className="glass rounded-2xl p-6 border border-white/5">
                   <GenreChart data={genre_dna} />
                 </div>
@@ -194,7 +195,7 @@ export default function ResultsPage() {
             )}
 
             {/* Create playlist */}
-            <Section title="🎵 Create Your Playlist">
+            <Section title={<> <Music2 size={18} /> Create Your Playlist</>}>
               <div className="glass rounded-2xl p-8 border border-white/5 text-center">
                 <p className="text-white/50 font-body text-sm mb-6 max-w-sm mx-auto">
                   Automatically generate a "My Musical DNA 🧬" playlist in your Spotify account with your top tracks.
@@ -208,10 +209,10 @@ export default function ResultsPage() {
         {/* MUSIC TAB */}
         {activeTab === 'music' && (
           <div className="space-y-10">
-            <Section title="🎤 Your Top Artists">
+            <Section title={<> <Users size={18} /> Your Top Artists</>}>
               <ArtistGrid artists={top_artists} />
             </Section>
-            <Section title="🎵 Your Top Tracks">
+            <Section title={<> <Music2 size={18} /> Your Top Tracks</>}>
               <div className="glass rounded-2xl border border-white/5 overflow-hidden">
                 <TrackList tracks={top_tracks} />
               </div>
@@ -222,7 +223,7 @@ export default function ResultsPage() {
         {/* SHARE TAB */}
         {activeTab === 'share' && (
           <div className="max-w-lg mx-auto">
-            <Section title="📤 Share Your Sonic Identity">
+            <Section title={<> <Share2 size={18} /> Share Your Sonic Identity</>}>
               <p className="text-white/40 text-sm font-body mb-6 text-center">
                 Download a beautiful card to share your music personality on social media.
               </p>

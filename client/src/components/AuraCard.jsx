@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { Music, Sun, User } from 'lucide-react'
 
 export function AlterEgoCard({ alterEgo, aiInsights }) {
   if (!alterEgo) return null
@@ -15,9 +16,15 @@ export function AlterEgoCard({ alterEgo, aiInsights }) {
         style={{ background: alterEgo.color || '#1DB954' }}
       />
       <div className="relative z-10">
-        <p className="text-white/30 text-xs font-mono uppercase tracking-widest mb-3">🎭 Your Music Alter Ego</p>
+        <div className="flex items-center gap-2 mb-3 text-white/30 text-xs font-mono uppercase tracking-widest">
+          <User size={12} />
+          <Music size={12} />
+          <span>Your Music Alter Ego</span>
+        </div>
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-4xl">{alterEgo.emoji}</span>
+          <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-2xl">
+            {alterEgo.emoji}
+          </div>
           <div>
             <h3 className="font-display font-extrabold text-xl text-white">{alterEgo.name}</h3>
             <p className="text-white/40 text-sm font-body">{alterEgo.title}</p>
@@ -45,7 +52,10 @@ export function AuraCard({ aiInsights }) {
     >
       <div className="absolute inset-0 bg-gradient-to-br from-purple-900/10 via-transparent to-cyan-900/10 pointer-events-none" />
       <div className="relative z-10">
-        <p className="text-white/30 text-xs font-mono uppercase tracking-widest mb-3">🌌 Emotional Aura</p>
+        <div className="flex items-center gap-2 mb-3 text-white/30 text-xs font-mono uppercase tracking-widest">
+          <Sun size={12} />
+          <span>Emotional Aura</span>
+        </div>
         <p className="text-white/80 font-body text-base leading-relaxed">
           {aiInsights.emotional_aura}
         </p>

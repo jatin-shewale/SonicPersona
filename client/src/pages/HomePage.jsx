@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import AnimatedBackground from '../components/AnimatedBackground'
-import { Sparkles, Music2, Zap, Brain, Share2 } from 'lucide-react'
+import { Sparkles, Music2, Zap, Brain, Share2, Clock, Heart, Headphones, Cloud } from 'lucide-react'
 
 const features = [
   { icon: Brain, label: 'AI Personality', desc: 'Deep character analysis from your listening DNA' },
@@ -13,14 +13,14 @@ const features = [
 ]
 
 const archetypes = [
-  { emoji: '🎵', name: 'The Melomaniac' },
-  { emoji: '🔥', name: 'The Rager' },
-  { emoji: '☁️', name: 'The Dreamer' },
-  { emoji: '📼', name: 'The Nostalgic' },
-  { emoji: '🦎', name: 'The Chameleon' },
-  { emoji: '🧠', name: 'The Cerebral' },
-  { emoji: '💜', name: 'The Soulful' },
-  { emoji: '🎧', name: 'The Hipster' },
+  { icon: Music2, name: 'The Melomaniac' },
+  { icon: Zap, name: 'The Rager' },
+  { icon: Cloud, name: 'The Dreamer' },
+  { icon: Clock, name: 'The Nostalgic' },
+  { icon: Sparkles, name: 'The Chameleon' },
+  { icon: Brain, name: 'The Cerebral' },
+  { icon: Heart, name: 'The Soulful' },
+  { icon: Headphones, name: 'The Hipster' },
 ]
 
 export default function HomePage() {
@@ -127,7 +127,7 @@ export default function HomePage() {
                 transition={{ delay: 0.7 + i * 0.06 }}
                 className="flex items-center gap-2 px-3 py-2 rounded-xl glass border border-white/5 text-sm"
               >
-                <span>{a.emoji}</span>
+                <a.icon size={16} className="text-brand-green" />
                 <span className="text-white/50 font-body text-xs">{a.name}</span>
               </motion.div>
             ))}

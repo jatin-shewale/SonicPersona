@@ -39,16 +39,7 @@ def top_tracks(token):
 @spotify_bp.route("/audio-features")
 @require_auth
 def audio_features(token):
-    from flask import request
-    track_ids = request.args.get("ids", "")
-    if not track_ids:
-        return jsonify({"error": "No track IDs provided"}), 400
-    
-    ids_list = track_ids.split(",")[:100]  # Spotify limit
-    data = spotify_service.get_audio_features(token, ids_list)
-    if data is None:
-        return jsonify({"error": "Failed to fetch audio features"}), 500
-    return jsonify(data)
+    return jsonify({"error": "Audio feature lookup is disabled on this server."}), 501
 
 
 @spotify_bp.route("/recently-played")

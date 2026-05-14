@@ -62,7 +62,7 @@ graph TD
 
 ### Core Functionality
 - **Secure Spotify Authentication**: OAuth 2.0 flow with PKCE for secure user data access
-- **Comprehensive Listening Analysis**: Analyzes top tracks, artists, genres, and audio features
+- **Comprehensive Listening Analysis**: Analyzes top tracks, artists, genres, and listening metadata
 - **AI-Powered Personality Insights**: Llama3 generates unique personality readings including roasts, compliments, and alter egos
 - **Interactive Visualizations**: 
   - Mood spectrum radar chart (energy, danceability, acousticness, valence)
@@ -258,6 +258,8 @@ npm run build
 
 ### Demo Mode
 Access `/personality/demo` endpoint for testing without Spotify authentication.
+
+Watch the demo: https://www.loom.com/share/6b2cfd2e37c847ebb5878291d93e8de0
 
 ### API Testing
 Use tools like Postman or curl to test backend endpoints:
